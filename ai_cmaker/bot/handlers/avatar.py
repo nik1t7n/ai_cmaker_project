@@ -292,7 +292,8 @@ async def generate_heygen_avatar(callback: types.CallbackQuery, state: FSMContex
         logging.debug("СОХРАНИЛИ ЮРЛ")
 
     except Exception as e:
-        await callback.message.answer(Text(Bold("Что то явно не то...")).as_markdown())
+        await state.update_data(is_video_generating=False)
+        await callback.message.answer(Text(Bold("Что то явно не то...")).as_markdown(), parse_mode=ParseMode.MARKDOWN_V2)
 
         logging.critical("Error during video generation: {}".format(e))
         logging.debug(f"Error: {e}")

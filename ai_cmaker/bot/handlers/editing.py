@@ -247,6 +247,7 @@ async def proccess_music_merging(state: FSMContext):
                     raise Exception("CANNOT DEDUCT VIDEO CREDIT")
 
         except Exception as e:
+            await state.update_data(is_video_generating=False)
             text = f"ERROR DURING credits DEDUCT: {str(e)}"
             raise Exception(text)
 
@@ -259,6 +260,7 @@ async def proccess_music_merging(state: FSMContext):
         await state.update_data(**preserved_data)
 
     except Exception as e:
+        await state.update_data(is_video_generating=False)
         await bot.send_message(
             chat_id=chat_id,
             text=Text(Bold("Не получилось отправить финальное видео")).as_markdown(),

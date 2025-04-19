@@ -123,6 +123,7 @@ async def edit_user_script(callback: types.CallbackQuery, state: FSMContext):
         )
         await callback.message.answer("Введите обновленный текст сценария:")
     except Exception as e:
+        await state.update_data(is_video_generating=False)
         # Если не получается отредактировать, отправляем новое сообщение
         logging.error(f"Ошибка при редактировании подписи: {e}")
         await callback.message.answer("Введите обновленный текст сценария:")
@@ -252,6 +253,7 @@ async def process_ai_script_input(message: types.Message, state: FSMContext):
         await state.set_state(VideoCreation.choosing_script_method)
 
     except Exception as e:
+        await state.update_data(is_video_generating=False)
         if waiting_message:
             try:
                 await waiting_message.delete()
