@@ -1,0 +1,16 @@
+
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.10.6",
+  "typeCheckingMode": "basic",
+  "reportOptionalMemberAccess": false,
+  "reportOptionalSubscript": false,
+  "reportOptionalCall": false,
+  "reportOptionalIterable": false,
+  "reportOptionalContextManager": false,
+  "reportAttributeAccessIssue": false,
+  "reportUnboundVariable": false,
+  "reportArgumentType": false
+}
+

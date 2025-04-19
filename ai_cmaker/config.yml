@@ -1,0 +1,47 @@
+video_editing:
+  subtitle_styles:
+    "1":
+      id: 07ffd4b8-4e1a-4ee3-8921-d58802953bcd
+      gif_url: https://cdn.zapcap.ai/template-gifs/07ffd4b8-4e1a-4ee3-8921-d58802953bcd.gif
+      local_path: assets/videos/gif_1.mp4
+    "2": 
+      id: 9a2b0ed5-231b-4052-9211-5af9dc2de65e
+      gif_url: https://cdn.zapcap.ai/template-gifs/9a2b0ed5-231b-4052-9211-5af9dc2de65e.gif
+      local_path: assets/videos/gif_2.mp4
+    "3":
+      id: a5619dcb-199d-4c6d-af05-6e5d5daef601
+      gif_url: https://cdn.zapcap.ai/template-gifs/a5619dcb-199d-4c6d-af05-6e5d5daef601.gif
+      local_path: assets/videos/gif_3.mp4
+    "4":
+      id: dfe027d9-bd9d-4e55-a94f-d57ed368a060
+      gif_url: https://cdn.zapcap.ai/template-gifs/dfe027d9-bd9d-4e55-a94f-d57ed368a060.gif
+      local_path: assets/videos/gif_4.mp4
+    "5":
+      id: 14bcd077-3f98-465b-b788-1b628951c340
+      gif_url: https://cdn.zapcap.ai/template-gifs/14bcd077-3f98-465b-b788-1b628951c340.gif
+      local_path: assets/videos/gif_5.mp4
+    "6":
+      id: d2018215-2125-41c1-940e-f13b411fff5c
+      gif_url: https://cdn.zapcap.ai/template-gifs/d2018215-2125-41c1-940e-f13b411fff5c.gif
+      local_path: assets/videos/gif_6.mp4
+
+avatar:
+  avatar_credentials:
+    tamsin:
+      avatar_id: "fdf8a83246c24644b196d16591b9fa70"
+      voice_id: "166aa8d7acd1495a839d34024ccb1505"
+    valorian:
+      avatar_id: "Artur_sitting_office_front"
+      voice_id: "2793c471d34a4bae8f5f4e47789dd7d7"
+    soleilana: 
+      avatar_id: "6c37b81dde314612bf93d59d49d1a204"
+      voice_id: "166aa8d7acd1495a839d34024ccb1505"
+    lucas:
+      avatar_id: "220d54045019433182de54afa4145c9e"
+      voice_id: "489bb1c4b3d14470aacbb76d55a9761a"
+    tim:
+      avatar_id: "214c3caef0144888bc67318fbc39ec34"
+      voice_id: "4d98f60e150446cfaf93105d0b74f863"
+    aelithra:
+      avatar_id: "1466e109650445a6b1944fc05cf9bdde"
+      voice_id: "166aa8d7acd1495a839d34024ccb1505" 
