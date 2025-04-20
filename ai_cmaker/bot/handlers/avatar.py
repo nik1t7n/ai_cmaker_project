@@ -1,4 +1,5 @@
 import asyncio
+from typing import Union
 import logging
 import os
 import uuid
@@ -34,16 +35,27 @@ bot, dp = asyncio.run(get_bot())
 router = Router()
 
 
-async def start_generation(callback: types.CallbackQuery, state: FSMContext):
-    await callback.answer()
-
-    original_text = Text(callback.message.text)
-
+async def start_generation(callback_or_message: Union[types.CallbackQuery, types.Message], state: FSMContext):
+    # Определяем тип переданного объекта и получаем нужные данные
+    if isinstance(callback_or_message, types.CallbackQuery):
+        # Для CallbackQuery
+        await callback_or_message.answer()  # Подтверждаем коллбэк
+        message = callback_or_message.message
+        chat_id = message.chat.id
+        original_text = Text(message.text)
+        is_callback = True
+    else:
+        # Для Message
+        message = callback_or_message
+        chat_id = message.chat.id
+        original_text = Text(message.text)
+        is_callback = False
+    
     # Объединяем тексты
     full_text = Text(
         original_text, "\n\n", Italic("==========\nПолетели генерировать!")
     ).as_markdown()
-
+    
     avatar_img_path = "assets/imgs/avatars.png"
     if os.path.exists(avatar_img_path):
         caption = (
@@ -52,24 +64,35 @@ async def start_generation(callback: types.CallbackQuery, state: FSMContext):
         )
         keyboard = build_avatar_inline_keyboard()
         await bot.send_photo(
-            callback.message.chat.id,
+            chat_id,
             photo=FSInputFile(avatar_img_path),
             caption=caption,
             reply_markup=keyboard,
         )
-        await callback.message.edit_text(
-            text=full_text, parse_mode=ParseMode.MARKDOWN_V2, reply_markup=None
-        )
+        
+        # Редактируем или отправляем сообщение в зависимости от контекста
+        try:
+            if is_callback:
+                await message.edit_text(
+                    text=full_text, parse_mode=ParseMode.MARKDOWN_V2, reply_markup=None
+                )
+            else:
+                # мы получаем сообщение, только если пользователь нажал /generate
+                # поэтому нет смысла редактировать предыдущее сообщение, потому что его нет
+                pass 
+        except Exception as e:
+            logging.warning(f"Не удалось отредактировать сообщение: {e}")
+        
         await state.set_state(VideoCreation.choosing_avatar)
     else:
         logging.warning(f"Файл с аватарами не найден: {avatar_img_path}")
         await bot.send_message(
-            callback.message.chat.id,
+            chat_id,
             "К сожалению, изображения аватаров временно недоступны. Попробуйте позже или обратитесь в поддержку.",
         )
         keyboard = get_greeting_inline_keyboard()
         await bot.send_message(
-            callback.message.chat.id,
+            chat_id,
             "Хотите попробовать другие функции?",
             reply_markup=keyboard,
         )
@@ -92,7 +115,7 @@ async def handle_create_demo_callback(callback: types.CallbackQuery, state: FSMC
 
     access = await check_user_credits(user_id=state_data["user_id"])
     if access:
-        await start_generation(callback=callback, state=state)
+        await start_generation(callback_or_message=callback, state=state)
     else:
 
         builder = InlineKeyboardBuilder()
@@ -116,7 +139,7 @@ async def handle_create_demo_callback(callback: types.CallbackQuery, state: FSMC
 
 @router.message(Command("generate"))
 async def handle_start_avatar_generation(
-    callback: types.CallbackQuery, state: FSMContext
+    message: types.Message, state: FSMContext
 ):
 
     state_data = await state.get_data()
@@ -131,14 +154,14 @@ async def handle_start_avatar_generation(
                 "Извините, но перед началом работы с ботом - вам следует активировать его, использовав команду /start"
             )
         ).as_markdown()
-        await callback.message.answer(
+        await message.answer(
             text=warning_msg, parse_mode=ParseMode.MARKDOWN_V2
         )
     if response.status_code == 200:
 
         access = await check_user_credits(user_id=state_data["user_id"])
         if access:
-            await start_generation(callback=callback, state=state)
+            await start_generation(callback_or_message=message, state=state)
         else:
             profile_command_url = f"{BOT_URL}?start=profile"
 
@@ -155,7 +178,7 @@ async def handle_start_avatar_generation(
             ).as_markdown()
 
             # Отправляем сообщение с клавиатурой
-            await callback.message.answer(
+            await message.answer(
                 text=no_access_msg,
                 parse_mode=ParseMode.MARKDOWN_V2,
                 reply_markup=builder.as_markup(),
