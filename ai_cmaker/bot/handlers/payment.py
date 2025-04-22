@@ -382,3 +382,4 @@ async def confirm_payment(callback: types.CallbackQuery, state: FSMContext):
             callback.bot, user_id, chat_id, order_id, credits_amount=int(package), state=state
         )
     )
+

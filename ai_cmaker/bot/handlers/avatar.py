@@ -144,6 +144,16 @@ async def handle_start_avatar_generation(
 
     state_data = await state.get_data()
 
+    is_video_generating = state_data.get("is_video_generating")
+    if is_video_generating is not None and is_video_generating:
+        indempotency_error_msg = Text(
+            Bold("Извините, но видео уже генерируется. Подождите, пока закончится предыдущая генерация, перед тем, как начать новую.")
+        ).as_markdown()
+        await message.answer(text=indempotency_error_msg, parse_mode=ParseMode.MARKDOWN_V2)
+        return
+
+
+
     user_id = state_data["user_id"]
     async with httpx.AsyncClient(timeout=10) as client:
         response = await client.get(f"{WEBHOOK_BASE_URL}/api/users/{user_id}")
@@ -235,6 +245,8 @@ async def avatar_chosen(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(lambda c: c.data and c.data.startswith("subtitle_style:"))
 async def generate_heygen_avatar(callback: types.CallbackQuery, state: FSMContext):
 
+    error_happened = False
+
     state_data = await state.get_data()
 
     is_video_generating = state_data.get("is_video_generating")
@@ -290,12 +302,17 @@ async def generate_heygen_avatar(callback: types.CallbackQuery, state: FSMContex
             raise RuntimeError("Job was not enqueued; possible duplicate job id?")
         video_url = await job.result(timeout=1200)
 
+        if not isinstance(video_url, str):
+            if video_url.get("code") == 400133:
+                await callback.message.answer("Недостаточно кредитов HeyGen!")
+            raise ValueError(f"Heygen returned an error payload: {video_url!r}")
+
         # video_url = "https://files2.heygen.ai/aws_pacific/avatar_tmp/9351014d20b44b408fd6952dc7c0ac42/a1ed538a42104eccb3f4b0c7e9772a1f.mp4?Expires=1744045988&Signature=AHSaTSipZ4X~ZzRm5yIh2zWXKK19UcKBvpRWB7bhQr5z8Nl-nNx9VRfPrNKHa~n4yGMsgMvviFOdOqAceKvTX8BkS61WGwCZLI8d1uHf3C6wVywgV7AA-irdms5QYzXEtIC-liUH9URhsw7aKvX6qhTvhjFIYh624cZX0t4pT79SjpFa9icpZSiLYw3ZAeR2~V8lgJEpeu4K1nzM0u85cIisYKj3OcEaAtcYyI~in5Gp1nv5QaFSh085Yw5DMilRyz~A~VPsJhKwzEMaAj7GXILbkSRnVfE6afuShvanHV8iLFof9rc0RFH0ahrq3EagB5inDOY87IitlbQl8XdwbA__&Key-Pair-Id=K38HBHX5LX3X2H"
 
         if not video_url:
             raise Exception("There is no VIDEO URL")
 
-        key = f"heygen/generated-{uuid.uuid4}.mp4"
+        key = f"heygen/generated-{uuid.uuid4()}.mp4"
         result = await download_from_url_and_to_s3(url=video_url, key=key)
 
         if not result:
@@ -315,11 +332,22 @@ async def generate_heygen_avatar(callback: types.CallbackQuery, state: FSMContex
         logging.debug("СОХРАНИЛИ ЮРЛ")
 
     except Exception as e:
+        error_happened = True
         await state.update_data(is_video_generating=False)
         await callback.message.answer(Text(Bold("Что то явно не то...")).as_markdown(), parse_mode=ParseMode.MARKDOWN_V2)
 
         logging.critical("Error during video generation: {}".format(e))
         logging.debug(f"Error: {e}")
+        
+        # Останавливаем анимацию и удаляем сообщение о загрузке
+        stop_animation.set()
+        await animation_task
+        try:
+            await waiting_message.delete()
+        except Exception as e:
+            logging.warning(f"Error during animation message deletion: {e}")
+        
+        # Важно - НЕ переходим к следующему шагу
         return
     finally:
         stop_animation.set()
@@ -330,5 +358,8 @@ async def generate_heygen_avatar(callback: types.CallbackQuery, state: FSMContex
         except Exception as e:
             logging.warning(f"Error during animation message deletion: {e}")
 
-        await state.set_state(VideoCreation.video_editing)
-        await proccess_video_editing(state)
+    if error_happened:
+        return
+
+    await state.set_state(VideoCreation.video_editing)
+    await proccess_video_editing(state)

@@ -1,7 +1,8 @@
-
+import yaml
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-import yaml
+
+from bot.constants import TELEGRAM_LINK_INDIVIDUAL
 
 
 def get_greeting_inline_keyboard() -> InlineKeyboardMarkup:
@@ -15,13 +16,14 @@ def get_greeting_inline_keyboard() -> InlineKeyboardMarkup:
     builder.adjust(2, 1)
     return builder.as_markup()
 
+
 def get_after_instructions_keyboard() -> InlineKeyboardMarkup:
-    
+
     builder = InlineKeyboardBuilder()
     builder.button(text="🚀 Пробуем!", callback_data="demo")
     builder.button(text="💎 Тарифы", callback_data="pricing")
     builder.button(text="❌ Вернуться на прошлый шаг", callback_data="back:start")
-    builder.adjust(2, 1) 
+    builder.adjust(2, 1)
     return builder.as_markup()
 
 
@@ -44,12 +46,12 @@ def build_avatar_inline_keyboard() -> InlineKeyboardMarkup:
     """
     builder = InlineKeyboardBuilder()
     # Определяем порядок аватаров
-    
+
     with open("config.yml", "r") as f:
         config = yaml.safe_load(f)
-        
+
     avatar_names = config["avatar"]["avatar_credentials"].keys()
-    
+
     for name in avatar_names:
         builder.button(text=name, callback_data=f"avatar:{name}")
 
@@ -69,15 +71,19 @@ def get_cancel_script_inline_keyboard() -> InlineKeyboardMarkup:
     builder.adjust(1)
     return builder.as_markup()
 
+
 def get_back_to_choosing_script_keyboard() -> InlineKeyboardMarkup:
     """
     Клавиатура, которая отменяет текущий выбор пользователя по написанию
     сценария и возвращает его опять к выбору (ИИ или самому)
     """
     builder = InlineKeyboardBuilder()
-    builder.button(text="❌ Вернуться к выбору", callback_data="back:choosing_script_method")
-    builder.adjust(1) 
+    builder.button(
+        text="❌ Вернуться к выбору", callback_data="back:choosing_script_method"
+    )
+    builder.adjust(1)
     return builder.as_markup()
+
 
 def get_subtitle_styles_inline_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
@@ -87,24 +93,30 @@ def get_subtitle_styles_inline_keyboard() -> InlineKeyboardMarkup:
     builder.adjust(3, 3)
     return builder.as_markup()
 
+
 def get_payment_keyboard() -> InlineKeyboardMarkup:
-    
+
     builder = InlineKeyboardBuilder()
-    
+
     # Payment options
     builder.button(text="10 видео", callback_data="payment:10")
     builder.button(text="30 видео", callback_data="payment:30")
     builder.button(text="50 видео", callback_data="payment:50")
     builder.button(text="100 видео", callback_data="payment:100")
-    
+    builder.button(
+        text="Индивидуальный тариф",
+        callback_data="individual_tariff",
+        url=TELEGRAM_LINK_INDIVIDUAL,
+    )
+
     # Back button
     builder.button(text="❌ Вернуться на прошлый шаг", callback_data="back:start")
-    
-    builder.adjust(2,2,1)  
+
+    builder.adjust(2, 2, 1, 1)
     return builder.as_markup()
 
 
-def get_after_ai_script_generation_inline_keyboard() -> InlineKeyboardMarkup: 
+def get_after_ai_script_generation_inline_keyboard() -> InlineKeyboardMarkup:
 
     builder = InlineKeyboardBuilder()
     builder.button(text="✅ Далее", callback_data="confirm_script")
@@ -112,13 +124,15 @@ def get_after_ai_script_generation_inline_keyboard() -> InlineKeyboardMarkup:
     builder.adjust(2)
     return builder.as_markup()
 
-def get_after_user_script_generation_inline_keyboard() -> InlineKeyboardMarkup: 
+
+def get_after_user_script_generation_inline_keyboard() -> InlineKeyboardMarkup:
 
     builder = InlineKeyboardBuilder()
     builder.button(text="✅ Далее", callback_data="confirm_script")
     builder.button(text="✏ Редактировать сценарий", callback_data="edit_user_script")
     builder.adjust(2)
     return builder.as_markup()
+
 
 def get_payment_confirmation_inline_keyboard() -> InlineKeyboardMarkup:
 
@@ -128,4 +142,3 @@ def get_payment_confirmation_inline_keyboard() -> InlineKeyboardMarkup:
     builder.button(text="Редактировать email", callback_data="edit_email")
     builder.adjust(1, 2)
     return builder.as_markup()
-

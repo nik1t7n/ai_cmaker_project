@@ -97,8 +97,22 @@ async def proccess_video_editing(state: FSMContext):
             parse_mode=ParseMode.MARKDOWN_V2,
         )
 
+        # Сбрасываем флаг генерации
+        await state.update_data(is_video_generating=False)
+        
         logging.critical("Error during video generation: {}".format(e))
         print(f"Error: {e}")
+        
+        # Останавливаем анимацию и удаляем сообщение о загрузке
+        stop_animation.set()
+        await animation_task
+        try:
+            await waiting_message.delete()
+        except Exception as e:
+            logging.warning(f"Error during animation message deletion: {e}")
+        
+        # НЕ переходим к следующему шагу!
+        return
     finally:
 
         stop_animation.set()
@@ -153,14 +167,28 @@ async def proccess_music_generation(state: FSMContext):
         await state.update_data(video_editing=video_editing_data)
 
     except Exception as e:
+        # Сбрасываем флаг генерации
+        await state.update_data(is_video_generating=False)
+        
         await bot.send_message(
             chat_id=chat_id,
-            text=Text(Bold("Что то явно не то...")).as_markdown(),
+            text=Text(Bold("Что то явно не то при генерации музыки...")).as_markdown(),
             parse_mode=ParseMode.MARKDOWN_V2,
         )
 
         logging.critical("Error during music generation: {}".format(e))
         print(f"Error: {e}")
+        
+        # Останавливаем анимацию и удаляем сообщение о загрузке
+        stop_animation.set()
+        await animation_task
+        try:
+            await waiting_message.delete()
+        except Exception as e:
+            logging.warning(f"Error during animation message deletion: {e}")
+        
+        # НЕ переходим к следующему шагу!
+        return
     finally:
 
         stop_animation.set()
@@ -260,15 +288,36 @@ async def proccess_music_merging(state: FSMContext):
         await state.update_data(**preserved_data)
 
     except Exception as e:
+        # Сбрасываем флаг генерации
         await state.update_data(is_video_generating=False)
+        
         await bot.send_message(
             chat_id=chat_id,
             text=Text(Bold("Не получилось отправить финальное видео")).as_markdown(),
             parse_mode=ParseMode.MARKDOWN_V2,
         )
 
-        logging.critical("Error during music generation: {}".format(e))
+        logging.critical("Error during video merging: {}".format(e))
         print(f"Error: {e}")
+        
+        # Останавливаем анимацию и удаляем сообщение о загрузке
+        stop_animation.set()
+        await animation_task
+        try:
+            await waiting_message.delete()
+        except Exception as e:
+            logging.warning(f"Error during animation message deletion: {e}")
+        
+        # Очищаем состояние, сохраняя только необходимые данные
+        state_data = await state.get_data()
+        preserved_data = {
+            key: state_data.get(key)
+            for key in ["chat_id", "user_id", "are_demo_credits_given"]
+        }
+        await state.clear()
+        await state.update_data(**preserved_data, is_video_generating=False)
+        
+        return
     finally:
 
         stop_animation.set()
