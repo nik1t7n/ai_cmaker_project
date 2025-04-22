@@ -1,6 +1,4 @@
-
-
-
+import urllib.parse
 from aiogram.utils.formatting import Text
 
 GREETING_TEXT = Text(
@@ -13,3 +11,9 @@ GREETING_TEXT = Text(
 WEBHOOK_BASE_URL = "http://webhook:8000"
 
 BOT_URL = "https://t.me/ai_cmaker_bot"
+
+
+predefined_message = "Здравствуйте!) я хочу создать своего ИИ Аватара для автоматического создания коротких видео 😎🔥"
+predefined_message = urllib.parse.quote(predefined_message) 
+chat_username = "Airrrro"
+TELEGRAM_LINK_INDIVIDUAL = f"https://t.me/{chat_username}?start&text={predefined_message}"

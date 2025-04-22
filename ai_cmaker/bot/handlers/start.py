@@ -83,26 +83,23 @@ async def cmd_start(message: types.Message, state: FSMContext):
                     f"Status: {response.status_code}\n"
                     f"Details: {response.text}"
                 )
-                await message.answer(
-                    error_msg, parse_mode=ParseMode.MARKDOWN_V2
-                )
+                await message.answer(error_msg, parse_mode=ParseMode.MARKDOWN_V2)
         except httpx.RequestError as exc:
             logging.critical("Critical error during user creation", f"Details: {exc}")
             raise Exception(f"Error during regitering user: {exc}")
 
-
     ### Give First 3 demo generations (credits) ###
-    
+
     if credits_given_flag is not None and credits_given_flag:
         logging.info("User already got free demo credits, so we skip this part")
-        pass 
+        pass
     else:
         credits_amount = 3
         async with httpx.AsyncClient(timeout=10) as client:
             try:
                 add_credits_response = await client.post(
                     f"{WEBHOOK_BASE_URL}/api/users/{user_id}/credits/add",
-                    params={"credits": credits_amount, "update_purchase_time": "true"}
+                    params={"credits": credits_amount, "update_purchase_time": "true"},
                 )
 
                 if add_credits_response.status_code == 200:
@@ -110,17 +107,16 @@ async def cmd_start(message: types.Message, state: FSMContext):
                     await state.update_data(are_demo_credits_given=True)
                 else:
                     logging.error(
-                            f"Unexpected error during credits adding",
-                            f"Status code: {add_credits_response.status_code}",
-                            f"Details: {add_credits_response.text}"
-                        )
-                    
+                        f"Unexpected error during credits adding",
+                        f"Status code: {add_credits_response.status_code}",
+                        f"Details: {add_credits_response.text}",
+                    )
+
             except Exception as e:
                 logging.critical(f"Error during adding credits: {e}")
                 raise Exception(f"Error during adding credits: {e}")
 
     ###
-
 
     greeting_text = GREETING_TEXT
 
@@ -188,7 +184,7 @@ async def handle_instruction_callback(callback: types.CallbackQuery, state: FSMC
         "\n",
         "=================",
         "\n\n",
-        commands_info, 
+        commands_info,
         "\n",
         "=================",
         "\n\n",
@@ -218,7 +214,8 @@ async def handle_pricing_callback(callback: types.CallbackQuery, state: FSMConte
         "• 30 видео — 45$ 💰\n"
         "• 50 видео — 70$ 💰\n"
         "• 100 видео — 135$ 💰\n\n"
-        "⏱ Важно: у вас есть ровно 28 дней, чтобы использовать приобретенные кредиты с момента покупки тарифа."
+        "⏱ Важно: у вас есть ровно 28 дней, чтобы использовать приобретенные кредиты с момента покупки тарифа.\n\n"
+        '👤 Хотите получить индивидуальный аватар с вашим лицом? Нажмите на кнопку "Индивидуальный тариф"!'
     )
 
     if os.path.exists(price_img_path):
