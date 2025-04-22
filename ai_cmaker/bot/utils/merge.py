@@ -9,7 +9,7 @@ from services.s3 import S3Service
 
 load_dotenv()
 
-async def merge_video_and_music(video_url: str, music_url: str, music_volume: float = 0.05) -> str:
+async def merge_video_and_music(video_url: str, music_url: str, music_volume: float = 0.01) -> str:
     async with httpx.AsyncClient(timeout=30) as client:
         # Загружаем видео и музыку
         video_response = await client.get(video_url)
