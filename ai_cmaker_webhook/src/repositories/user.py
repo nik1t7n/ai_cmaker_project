@@ -49,15 +49,7 @@ class UserRepository:
         """
         new_user = User(
             telegram_id=user_create.user_id,
-            credits_total=0,
-            credits_left=0,
-            is_paid=False,
-            purchase_time=None,
-            credits_expire_date=None,
-            total_generations=0,
-            total_prompt_tokens=0,
-            total_response_tokens=0,
-            total_video_duration_time=0,
+            purchase_time=datetime.now(),
             other_data={},
         )
 

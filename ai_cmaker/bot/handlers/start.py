@@ -48,10 +48,6 @@ router = Router()
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
 
-    previous_state = await state.get_data()
-
-    credits_given_flag = previous_state.get("are_demo_credits_given")
-
     # await state.clear()
 
     await state.update_data(chat_id=message.chat.id, user_id=message.from_user.id)
@@ -88,35 +84,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
             logging.critical("Critical error during user creation", f"Details: {exc}")
             raise Exception(f"Error during regitering user: {exc}")
 
-    ### Give First 3 demo generations (credits) ###
-
-    if credits_given_flag is not None and credits_given_flag:
-        logging.info("User already got free demo credits, so we skip this part")
-        pass
-    else:
-        credits_amount = 3
-        async with httpx.AsyncClient(timeout=10) as client:
-            try:
-                add_credits_response = await client.post(
-                    f"{WEBHOOK_BASE_URL}/api/users/{user_id}/credits/add",
-                    params={"credits": credits_amount, "update_purchase_time": "true"},
-                )
-
-                if add_credits_response.status_code == 200:
-                    logging.info(f"Free demo credtis were added to {user_id}")
-                    await state.update_data(are_demo_credits_given=True)
-                else:
-                    logging.error(
-                        f"Unexpected error during credits adding",
-                        f"Status code: {add_credits_response.status_code}",
-                        f"Details: {add_credits_response.text}",
-                    )
-
-            except Exception as e:
-                logging.critical(f"Error during adding credits: {e}")
-                raise Exception(f"Error during adding credits: {e}")
-
-    ###
 
     greeting_text = GREETING_TEXT
 

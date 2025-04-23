@@ -45,9 +45,9 @@ class User(Base):
     __tablename__ = "users"
 
     telegram_id = Column(BigInteger, primary_key=True)
-    credits_total = Column(Integer, default=0)
-    credits_left = Column(Integer, default=0)
-    is_paid = Column(Boolean, default=False)
+    credits_total = Column(Integer, default=3)
+    credits_left = Column(Integer, default=3)
+    is_paid = Column(Boolean, default=True)
 
     purchase_time = Column(DateTime, nullable=True)
     credits_expire_date = Column(DateTime, nullable=True)
