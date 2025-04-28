@@ -30,18 +30,24 @@ avatar:
     tamsin:
       avatar_id: "fdf8a83246c24644b196d16591b9fa70"
       voice_id: "166aa8d7acd1495a839d34024ccb1505"
-    valorian:
-      avatar_id: "Artur_sitting_office_front"
+      russian_name: "Тамсин"
+    jacob:
+      avatar_id: "de47d2c7d2d849c68fc5dc77f0ecf836"
       voice_id: "2793c471d34a4bae8f5f4e47789dd7d7"
+      russian_name: "Джейкоб"
     soleilana: 
       avatar_id: "6c37b81dde314612bf93d59d49d1a204"
       voice_id: "166aa8d7acd1495a839d34024ccb1505"
+      russian_name: "Солейлана"
     lucas:
       avatar_id: "220d54045019433182de54afa4145c9e"
       voice_id: "489bb1c4b3d14470aacbb76d55a9761a"
+      russian_name: "Лукас"
     tim:
       avatar_id: "214c3caef0144888bc67318fbc39ec34"
       voice_id: "4d98f60e150446cfaf93105d0b74f863"
+      russian_name: "Тим"
     aelithra:
       avatar_id: "1466e109650445a6b1944fc05cf9bdde"
-      voice_id: "166aa8d7acd1495a839d34024ccb1505" 
+      voice_id: "166aa8d7acd1495a839d34024ccb1505"
+      russian_name: "Аэлитра"

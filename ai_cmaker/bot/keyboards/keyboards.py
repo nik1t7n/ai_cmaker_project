@@ -42,21 +42,24 @@ def get_script_method_inline_keyboard() -> InlineKeyboardMarkup:
 def build_avatar_inline_keyboard() -> InlineKeyboardMarkup:
     """
     Создает инлайн-клавиатуру для выбора аватара.
-    Каждая кнопка содержит callback_data вида "avatar:<ключ>"
+    Каждая кнопка содержит callback_data вида "avatar:<ключ>",
+    но текст кнопки отображает russian_name из конфигурации.
     """
     builder = InlineKeyboardBuilder()
-    # Определяем порядок аватаров
-
+    # Загружаем конфигурацию
     with open("config.yml", "r") as f:
         config = yaml.safe_load(f)
-
-    avatar_names = config["avatar"]["avatar_credentials"].keys()
-
-    for name in avatar_names:
-        builder.button(text=name, callback_data=f"avatar:{name}")
-
+    
+    # Получаем данные аватаров
+    avatar_credentials = config["avatar"]["avatar_credentials"]
+    
+    # Для каждого аватара создаем кнопку с русским названием
+    for key, avatar_data in avatar_credentials.items():
+        # Используем russian_name для текста кнопки, но сохраняем ключ в callback_data
+        russian_name = avatar_data.get("russian_name", key)  # Используем ключ как значение по умолчанию
+        builder.button(text=russian_name, callback_data=f"avatar:{key}")
+    
     builder.button(text="Вернуться к предыдущему шагу", callback_data="back:start")
-
     builder.adjust(3, 3, 1)
     return builder.as_markup()
 

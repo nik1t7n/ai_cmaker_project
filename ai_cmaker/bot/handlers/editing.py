@@ -231,7 +231,7 @@ async def proccess_music_merging(state: FSMContext):
         )
         # merged_video_url = "https://s3.timeweb.cloud/c9f29c5b-3c3452a4-fb03-4813-a0b1-2fc03a79bc51/merged/07b22c88-1bec-4f90-91b6-bb781466d292.mp4"
 
-        final_video_file = URLInputFile(merged_video_url)
+        final_video_file = URLInputFile(merged_video_url, filename="your_video.mp4")
 
         # key = f"final/full-video-{uuid.uuid4()}.mp4"
         # result = await download_from_url_and_to_s3(url=merged_video_url, key=key)
@@ -250,9 +250,9 @@ async def proccess_music_merging(state: FSMContext):
                 "\n\n" "Или же использовать кнопку ниже, чтобы создать новое видео. 👇",
             ).as_markdown()
 
-            await bot.send_video(
+            await bot.send_document(
                 chat_id=chat_id,
-                video=final_video_file,
+                document=final_video_file,
                 caption=caption,
                 parse_mode=ParseMode.MARKDOWN_V2,
                 reply_markup=keyboard,

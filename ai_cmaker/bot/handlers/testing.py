@@ -4,6 +4,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, InputMediaVideo, URLInputFile
 from aiogram.utils.formatting import Bold, Text, Url, Italic
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bot.init import get_bot 
 import yaml
 from bot.keyboards.keyboards import get_subtitle_styles_inline_keyboard 
@@ -43,5 +44,31 @@ async def cmd_test_gif(message: types.Message, state: FSMContext):
         parse_mode=ParseMode.MARKDOWN_V2,
     )
 
+
+@router.message(Command("test_send_video"))
+async def cmd_test_send_video(message: types.Message, state: FSMContext):
+        url = "https://s3.timeweb.cloud/c9f29c5b-3c3452a4-fb03-4813-a0b1-2fc03a79bc51/final/86146b66-bfe9-4fbf-9f7a-45112dcff69d.mp4"
+        final_video_file = URLInputFile(url, filename="your_video.mp4")
+
+        chat_id = message.chat.id 
+
+        builder = InlineKeyboardBuilder()
+        builder.button(text="🔄 Сгенерировать еще видео", callback_data="demo")
+        keyboard = builder.as_markup()
+
+        caption = Text(
+            Bold("✨ Ваше финальное видео готово! ✨"),
+            "\n\n",
+            "Вы можете посмотреть статус профиля через команду /profile",
+            "\n\n" "Или же использовать кнопку ниже, чтобы создать новое видео. 👇",
+        ).as_markdown()
+
+        await bot.send_document(
+            chat_id=chat_id,
+            document=final_video_file,
+            caption=caption,
+            parse_mode=ParseMode.MARKDOWN_V2,
+            reply_markup=keyboard,
+        )
 
 
